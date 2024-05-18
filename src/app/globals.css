@@ -7,7 +7,15 @@
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
 }
-
+.spinner-border {
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: #3b82f6; /* Tailwind Blue-500 */
+}
+.profile-background-image--default {
+  background: url('./banner-svg.png') 50% / cover;
+}
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
