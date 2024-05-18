@@ -69,6 +69,10 @@ This project is a web application that generates a LinkedIn profile based on the
 - `styles/globals.css`: Global styles including Tailwind CSS and custom spinner styles.
 - `.env.local`: Environment variables including the OpenAI API key.
 
+## Demo
+
+You can view a live demo of the application [here](https://linkedin-profile-generator.netlify.app/)
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
