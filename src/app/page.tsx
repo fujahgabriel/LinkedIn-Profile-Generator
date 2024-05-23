@@ -35,10 +35,11 @@ type LinkedInProfile = {
   certification: Certification[];
   skills: string[];
   languages: string[];
+  career: string;
 };
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || '',
   dangerouslyAllowBrowser: true,
 });
 
@@ -63,7 +64,8 @@ export default function Home() {
       education: [],
       certification: [],
       skills: [],
-      languages: []
+      languages: [],
+      career: ''
     });
 
     try {
@@ -73,18 +75,11 @@ export default function Home() {
           { role: "system", content: "You are a helpful professional resume/cv assistant." },
           {
             role: "user", content: `
-          Based on the following CV/resume text, create a LinkedIn profile with a heading, optimized about section, optimized experience section, certification(courses) section, award section, language section, and skills section:\n\n
-
-          Use one of the following templates to get the best results:\n\n
-          -I am a [job title], and I help [your clients] to achieve [dream outcome].
-          -I am a [job title] at [company]. Driving [impact/change] in [industry/field].
-          -I am [job title], delivering [solution/benefit] to [target audience/industry].
-          -I am a [job title] at [company], specializing in [skills/industry].
-
-
+          Based on the following CV/resume text, create a LinkedIn profile with a heading, optimized about section, optimized experience section, certification(courses) section, award section, language section,  skills section and  list possible  career paths in career section:\n\n
+         
           ${cvText}\n\n
 
-          The output should be in the following JSON format:\n
+          The output should be in the following JSON format below, validate that output is a valid javascript JSON format to be parsed {} remove unnecessary characters:\n\n
           {
             "name": "Profile Name",
             "heading": "Profile Heading",
@@ -118,7 +113,8 @@ export default function Home() {
               ...
             ],
             "skills": ["Skill 1", "Skill 2", ...],
-            "languages": ["Language 1", "Language 2", ...]
+            "languages": ["Language 1", "Language 2", ...],
+            "career": "Career Path"
           }` },
         ],
       });
@@ -129,8 +125,8 @@ export default function Home() {
         setLoading(false);
         setStreaming(false);
       }
-
-      const parsedData: LinkedInProfile = JSON.parse(responseData);
+      let cleanedJsonString = responseData.replace(/```json\n/g, '');
+      const parsedData: LinkedInProfile = JSON.parse(cleanedJsonString);
 
       // Simulate streaming effect
       const simulateStreaming = (parsedData: LinkedInProfile) => {
@@ -150,6 +146,15 @@ export default function Home() {
           setProfile((prev) => ({
             ...prev,
             about: parsedData.about,
+          } as LinkedInProfile));
+        }, timeout);
+
+        timeout += 100;
+
+        setTimeout(() => {
+          setProfile((prev) => ({
+            ...prev,
+            career: parsedData.career,
           } as LinkedInProfile));
         }, timeout);
 
@@ -215,6 +220,8 @@ export default function Home() {
           setLoading(false);
           setStreaming(false);
         }, timeout + parsedData.languages.length * 100);
+
+        
       };
 
       simulateStreaming(parsedData);
@@ -229,7 +236,8 @@ export default function Home() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">LinkedIn Profile Generator</h1>
+      <h1 className="text-2xl font-bold  leading-none">LinkedIn Profile Generator</h1>
+      <p className='text-xs mb-4'>Copy your CV/resume text (docs/pdf)</p>
       <textarea
         className="w-full p-2 border rounded mb-4 text-gray-900"
         rows={10}
@@ -324,6 +332,11 @@ export default function Home() {
                 <li key={index}>{lang}</li>
               ))}
             </ul>
+          </Card>
+
+          <Card>
+            <h3 className="text-lg font-bold mt-4">Possible Career Path</h3>
+            <p className='text-sm'>{profile.career}</p>
           </Card>
         </div>
       )}
